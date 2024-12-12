@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRNTD Egg Hunt</title>
+    <!-- A-Frame library -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- A-Frame Environment Component -->
+    <script src="https://cdn.jsdelivr.net/gh/supermedium/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+    <!-- A-Frame Animation Component -->
+    <script src="https://unpkg.com/aframe-animation-component@^4.1.2/dist/aframe-animation-component.min.js"></script>
+    <!--Sweet Alert Component-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            cursor: none; /* Hide the computer cursor */
+        }
+        @font-face {
+            font-family: 'HelveticaNeue'; 
+            src: url('assets/fonts/HelveticaNeue-Bold.woff2');
+        }
+    </style>
+</head>
+<body>
+    <a-scene>
+        <!-- Assets for preloading images -->
+        <a-assets>
+            <img id="forest-img" src="assets/img/forestImg.png" alt="Forest">
+            <img id="egypt-img" src="assets/img/egyptImg.png" alt="Egypt">
+            <img id="tron-img" src="assets/img/tronImg.png" alt="Tron">
+            <a-asset-item id="golden-egg-model" src="assets/models/goldenEgg.glb"></a-asset-item>
+            <a-asset-item id="song-name-model" src="assets/models/songName.glb"></a-asset-item>
+            <a-asset-item id="prntd-logo" src="assets/models/prntd_logo.glb"></a-asset-item>
+            <a-asset-item id="rocket-model" src="assets/models/rocket.glb"></a-asset-item>
+            <a-asset-item id="rules" src="assets/models/ruleboard.glb"></a-asset-item>
+            <audio id="background-music" src="assets/audio/backgroundMusic.mp3"></audio>
+        </a-assets>
+
+        <!-- Background Music -->
+        <a-sound
+            src="#background-music"
+            autoplay="true"
+            loop="true"
+            position="0 1.6 -50"
+            poolSize="10">
+        </a-sound>
+
+        <!-- 3D Model (PRNTD Logo) -->
+        <a-entity
+            gltf-model="#prntd-logo"
+            position="0 4 -10"
+            scale="3 3 3"
+            rotation="0 0 0">
+        </a-entity>
+
+        <!-- Ruleboard-->
+         <a-entity
+            gltf-model="#rules"
+            position="14 5 -11"
+            scale="2 2 2"
+            rotation="0 -120 0 ">
+        </a-entity>
+
+
+        <!-- Golden Egg -->
+        <a-entity
+            id="golden-egg"
+            gltf-model="#golden-egg-model"
+            position="50 0.5 -70"
+            scale="0.5 0.5 0.5"
+            rotation="0 45 0"
+            visible="false"
+            animation__spin="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear"
+            animation__hover="property: position; dir: alternate; to: 50 1.5 -70; loop: true; dur: 2000; easing: easeInOutSine">
+        </a-entity>
+
+        <!-- 3D Model (Song Name) -->
+        <a-entity
+            id="song-name"
+            gltf-model="#song-name-model"
+            position="0 4 -7"
+            scale="1 1 1"
+            rotation="0 45 0"
+            volume="10">
+        </a-entity>
+
+        <!-- 3D Model (Rocket) -->
+        <a-entity
+            id="rocket"
+            gltf-model="#rocket-model"
+            position="2 3 -70"
+            scale="0.5 0.5 0.5"
+            rotation="0 45 0">
+        </a-entity>
+
+        <!-- Environment -->
+        <a-entity id="environment" environment="preset: tron;"></a-entity>
+
+        <!-- Portal to Forest -->
+        <a-entity id="portal-forest" class="clickable" position="-3 1.5 -10">
+            <a-cylinder
+                radius="1"
+                height="0.2"
+                rotation="90 0 0"
+                material="src: #forest-img; opacity: 0.8; color: #333333;"
+                animation__mouseenter="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-cylinder>
+        </a-entity>
+
+        <!-- Portal to Egypt -->
+        <a-entity id="portal-egypt" class="clickable" position="3 1.5 -10">
+            <a-cylinder
+                radius="1"
+                height="0.2"
+                rotation="90 0 0"
+                material="src: #egypt-img; opacity: 0.8; color: #333333;"
+                animation__mouseenter="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-cylinder>
+        </a-entity>
+
+        <!-- Portal to Tron -->
+        <a-entity id="portal-tron" class="clickable" position="0 1.5 -10">
+            <a-cylinder
+                radius="1"
+                height="0.2"
+                rotation="90 0 0"
+                material="src: #tron-img; opacity: 0.8; color: #333333;"
+                animation__mouseenter="property: scale; to: 1.5 1.5 1.5; startEvents: mouseenter; dur: 200"
+                animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200">
+            </a-cylinder>
+        </a-entity>
+
+        <!-- Camera with Cursor -->
+        <a-camera position="0 1.6 0">
+            <a-cursor color="white"></a-cursor>
+        </a-camera>
+
+        <!-- Lights -->
+        <a-light type="directional" color="#FFFFFF" intensity="0.8" position="-1 2 1"></a-light>
+        <a-light type="ambient" color="#FFF" intensity="0.5"></a-light>
+    </a-scene>
+
+    <!-- Click Egg Method -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const goldenEgg = document.querySelector('#golden-egg');
+
+            // Ensure the music continues after SweetAlert interaction
+            function ensureMusicPlays() {
+                if (backgroundMusic.paused) {
+                    backgroundMusic.play();
+                }
+            }
+
+            // Add click event to the golden egg
+            goldenEgg.addEventListener('click', () => {
+                // Show a popup message
+                Swal.fire({
+                    title: '<span style="font-family: \'HelveticaNeue\', sans-serif; color: #333333;">Congratulations!</span>',
+                    html: `
+                        <div style="font-family: 'HelveticaNeue', sans-serif; color: #555555;">
+                            <p>Get your free shirt!</p>
+                            <img src="assets/img/prntdLogo.png" alt="PRNTD Logo" style="width: 100px; margin: 20px auto;">
+                        </div>
+                    `,
+                    background: '#f8f8f8',
+                    showConfirmButton: true,
+                    confirmButtonText: '<span style="font-family: \'HelveticaNeue\', sans-serif;">Claim Now</span>',
+                    confirmButtonColor: '#FE0000',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to the prize link
+                        window.location.href = 'https://prntdbybdq.com/discount/EGGBYPRNTD24';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const environment = document.querySelector('#environment');
+            const portalForest = document.querySelector('#portal-forest');
+            const portalEgypt = document.querySelector('#portal-egypt');
+            const portalTron = document.querySelector('#portal-tron');
+            const rocket = document.querySelector('#rocket');
+            const egg = document.querySelector('#golden-egg');
+
+            // Function to switch environments
+            function switchEnvironment(preset) {
+                console.log(`Switching to environment: ${preset}`);
+                environment.setAttribute('environment', 'preset: ' + preset);
+
+                // Manage visibility of elements based on environment
+                const isTron = preset === 'tron';
+                const isForest = preset === 'forest';
+                const isEgypt = preset === 'egypt';
+
+                rocket.setAttribute('visible', isTron);
+                egg.setAttribute('visible', isEgypt);
+                portalForest.setAttribute('visible', !isForest);
+                portalEgypt.setAttribute('visible', !isEgypt);
+                portalTron.setAttribute('visible', !isTron);
+            }
+            // Set initial visibility based on the starting environment
+            switchEnvironment('tron'); // Set initial environment to 'tron'
+
+
+            // Add click event listeners to portals
+            portalForest.addEventListener('click', () => switchEnvironment('forest'));
+            portalEgypt.addEventListener('click', () => switchEnvironment('egypt'));
+            portalTron.addEventListener('click', () => switchEnvironment('tron'));
+        });
+    </script>
+</body>
+</html>
