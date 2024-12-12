@@ -148,9 +148,11 @@
     <!-- Ensure Music Plays Method-->
      <script>
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded and parsed');
             const backgroundMusic = document.querySelector('#background-music');
             
             function playMusicOnInteraction() {
+                console.log('User interaction detected, attempting to play audio');
                 if (backgroundMusic.paused) {
                     backgroundMusic.play().catch(error => {
                         console.error('Autoplay failed:', error);
