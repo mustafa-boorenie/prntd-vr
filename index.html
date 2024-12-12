@@ -145,6 +145,25 @@
         <a-light type="ambient" color="#FFF" intensity="0.5"></a-light>
     </a-scene>
 
+    <!-- Ensure Music Plays Method-->
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const backgroundMusic = document.querySelector('#background-music');
+            
+            function playMusicOnInteraction() {
+                if (backgroundMusic.paused) {
+                    backgroundMusic.play().catch(error => {
+                        console.error('Autoplay failed:', error);
+                    });
+                }
+            }
+
+            // Start music after user interaction
+            document.body.addEventListener('click', playMusicOnInteraction, { once: true });
+            document.body.addEventListener('touchstart', playMusicOnInteraction, { once: true });
+        });
+     </script>
+
     <!-- Click Egg Method -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -182,6 +201,8 @@
             });
         });
     </script>
+
+    
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
