@@ -179,41 +179,38 @@
     <!-- Joystick to Touch Method-->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-          // Only initialize the joystick on touch devices
-          if ('ontouchstart' in window || navigator.maxTouchPoints) {
+        // Only initialize the joystick on touch devices
+        if ('ontouchstart' in window || navigator.maxTouchPoints) {
             const joystickContainer = document.getElementById('joystickContainer');
             const joystick = nipplejs.create({
-              zone: joystickContainer,
-              mode: 'static',
-              position: { left: '75px', bottom: '75px' },
-              color: 'blue'
+            zone: joystickContainer,
+            mode: 'static',
+            position: { left: '75px', bottom: '75px' },
+            color: 'blue'
             });
-      
             // Select the A-Frame camera entity
             const cameraEl = document.querySelector('a-camera');
-      
-            // Listen for move events on the joystick
+
+            // Listen for move events on the joystick using the position offset
             joystick.on('move', (evt, data) => {
-              if (data && data.angle && data.force) {
-                // Calculate movement deltas; adjust the multiplier (0.05) for sensitivity
-                const deltaX = Math.cos(data.angle.radian) * data.force * 0.05;
-                const deltaZ = Math.sin(data.angle.radian) * data.force * 0.05;
-                // Get the current camera position
-                const pos = cameraEl.getAttribute('position');
-                // Update the camera's position (note: subtract deltaZ to move forward in A-Frame's coordinate system)
+            if (data && data.position) {
+                // data.position.x and data.position.y are the displacement from the center (in pixels)
+                // Multiply these values by a sensitivity factor to map them to your scene's scale.
+                const sensitivity = 0.05; // adjust as needed
+                const currentPos = cameraEl.getAttribute('position');
                 cameraEl.setAttribute('position', {
-                  x: pos.x + deltaX,
-                  y: pos.y,
-                  z: pos.z - deltaZ
+                x: currentPos.x + data.position.x * sensitivity,
+                y: currentPos.y, // keep Y unchanged (or adjust if you want vertical movement)
+                z: currentPos.z - data.position.y * sensitivity // subtract y to account for A-Frame's -Z forward direction
                 });
-              }
+            }
             });
-      
-            // Optionally, handle the "end" event (e.g., to stop movement or add inertia)
+
+            // Optionally, handle the "end" event if needed
             joystick.on('end', () => {
-              // This example doesn't include inertia; you could add logic here if desired.
+            // Add any cleanup or inertia-stopping logic here if desired.
             });
-          }
+        }
         });
       </script>
 
