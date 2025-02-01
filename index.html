@@ -12,6 +12,24 @@
     <script src="https://unpkg.com/aframe-animation-component@^4.1.2/dist/aframe-animation-component.min.js"></script>
     <!--Sweet Alert Component-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include nipple.js (add this with your other scripts) -->
+<script src="https://unpkg.com/nipplejs@0.7.3/dist/nipplejs.min.js"></script>
+    <style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        cursor: none; /* Hide the computer cursor */
+    }
+    /* Joystick container styles */
+    #joystickContainer {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        width: 150px;
+        height: 150px;
+        z-index: 1000;
+    }
+    </style>
     <style>
         body {
             margin: 0;
@@ -31,6 +49,7 @@
             <img id="forest-img" src="assets/img/forestImg.png" alt="Forest">
             <img id="egypt-img" src="assets/img/egyptImg.png" alt="Egypt">
             <img id="tron-img" src="assets/img/tronImg.png" alt="Tron">
+            <a-asset-item id="prntd-hoodie-model" src="assets/models/prntdHoodie.glb"></a-asset-item>
             <a-asset-item id="golden-egg-model" src="assets/models/goldenEgg.glb"></a-asset-item>
             <a-asset-item id="song-name-model" src="assets/models/songName.glb"></a-asset-item>
             <a-asset-item id="prntd-logo" src="assets/models/prntd_logo.glb"></a-asset-item>
@@ -38,6 +57,12 @@
             <a-asset-item id="rules" src="assets/models/ruleboard.glb"></a-asset-item>
             <audio id="background-music" src="assets/audio/backgroundMusic.mp3"></audio>
         </a-assets>
+
+
+        <!--Camera to Joystick-->
+        <a-camera position="0 1.6 0">
+            <a-cursor color="white"></a-cursor>
+        </a-camera>
 
         <!-- Background Music -->
         <a-sound
@@ -96,6 +121,18 @@
             rotation="0 45 0">
         </a-entity>
 
+        <!-- 3D Model (PRNTD HOODIE) -->
+        <a-entity
+            id="prntdHoodie"
+            gltf-model="#prntd-hoodie-model"
+            position="6 -1 -5"
+            scale="2 2 2"
+            rotation="0 -45 0"
+            class="clickable"
+            animation__mouseenter="property: scale; to: 2.5 2.5 2.5; startEvents: mouseenter; dur: 200"
+            animation__mouseleave="property: scale; to: 2 2 2; startEvents: mouseleave; dur: 200">
+        </a-entity>
+
         <!-- Environment -->
         <a-entity id="environment" environment="preset: tron;"></a-entity>
 
@@ -145,6 +182,48 @@
         <a-light type="ambient" color="#FFF" intensity="0.5"></a-light>
     </a-scene>
 
+
+    <!-- Joystick to Touch Method-->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          // Only initialize the joystick on touch devices
+          if ('ontouchstart' in window || navigator.maxTouchPoints) {
+            const joystickContainer = document.getElementById('joystickContainer');
+            const joystick = nipplejs.create({
+              zone: joystickContainer,
+              mode: 'static',
+              position: { left: '75px', bottom: '75px' },
+              color: 'blue'
+            });
+      
+            // Select the A-Frame camera entity
+            const cameraEl = document.querySelector('a-camera');
+      
+            // Listen for move events on the joystick
+            joystick.on('move', (evt, data) => {
+              if (data && data.angle && data.force) {
+                // Calculate movement deltas; adjust the multiplier (0.05) for sensitivity
+                const deltaX = Math.cos(data.angle.radian) * data.force * 0.05;
+                const deltaZ = Math.sin(data.angle.radian) * data.force * 0.05;
+                // Get the current camera position
+                const pos = cameraEl.getAttribute('position');
+                // Update the camera's position (note: subtract deltaZ to move forward in A-Frame's coordinate system)
+                cameraEl.setAttribute('position', {
+                  x: pos.x + deltaX,
+                  y: pos.y,
+                  z: pos.z - deltaZ
+                });
+              }
+            });
+      
+            // Optionally, handle the "end" event (e.g., to stop movement or add inertia)
+            joystick.on('end', () => {
+              // This example doesn't include inertia; you could add logic here if desired.
+            });
+          }
+        });
+      </script>
+
     <!-- Ensure Music Plays Method-->
      <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -166,6 +245,16 @@
         });
      </script>
 
+     <!--Click PRNTD Hoodie Method-->
+     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const prntdHoodie = document.querySelector('#prntdHoodie');
+          prntdHoodie.addEventListener('click', () => {
+            window.location.href = 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie';
+          });
+        });
+      </script>
+
     <!-- Click Egg Method -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -177,6 +266,7 @@
                     backgroundMusic.play();
                 }
             }
+
 
             // Add click event to the golden egg
             goldenEgg.addEventListener('click', () => {
