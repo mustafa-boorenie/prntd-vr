@@ -179,44 +179,58 @@
     <!-- Joystick to Touch Method-->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-        // Remove or modify the touch check for desktop testing if needed.
         if ('ontouchstart' in window || navigator.maxTouchPoints) {
-                const joystickContainer = document.getElementById('joystickContainer');
-                const joystick = nipplejs.create({
-                    zone: joystickContainer,
-                    mode: 'static',
-                    position: { left: '75px', bottom: '75px' },
-                    color: 'blue'
-                });
+            const joystickContainer = document.getElementById('joystickContainer');
+            const joystick = nipplejs.create({
+                zone: joystickContainer,
+                mode: 'static',
+                position: { left: '75px', bottom: '75px' },
+                color: 'blue'
+            });
+            
+            // Ensure the camera element is the one you want to move (assign an id for clarity)
+            const cameraEl = document.getElementById('moveCamera') || document.querySelector('a-camera');
+            
+            joystick.on('move', (evt, data) => {
+                if (data && data.force && data.angle && typeof data.angle.radian === 'number') {
+                // Compute normalized vector from the angle in radians.
+                const normVector = {
+                    x: Math.cos(data.angle.radian),
+                    y: Math.sin(data.angle.radian)
+                };
                 
-                // Ensure you're selecting the intended camera.
-                // For clarity, consider giving your camera an id, e.g. <a-camera id="moveCamera" ...>
-                const cameraEl = document.querySelector('a-camera');
+                // Set sensitivity; adjust as needed.
+                const sensitivity = 0.01;
                 
-                joystick.on('move', (evt, data) => {
-                    console.log('Joystick move event:', data);
-                    if (data && data.force && data.position) {
-                    // Adjust sensitivity until the movement feels right
-                    const sensitivity = 0.005; // you may need to experiment with this value
-                    const currentPos = cameraEl.getAttribute('position');
-                    
-                    // data.vector is a normalized vector { x, y } for the joystick direction.
-                    // data.force gives the magnitude of the movement.
-                    cameraEl.setAttribute('position', {
-                        x: currentPos.x + (data.position.x-(75))* data.force * sensitivity,
-                        y: currentPos.y,
-                        // In A-Frame, moving forward typically means decreasing the z value.
-                        z: currentPos.z + (data.position.y-(window.innerHeight-75))* data.force * sensitivity
-                    });
-                    }
-                });
+                // Calculate movement delta based on force.
+                const dx = normVector.x * data.force * sensitivity;
+                const dz = normVector.y * data.force * sensitivity;
                 
-                joystick.on('end', () => {
-                    console.log('Joystick ended');
+                // Get the current camera position.
+                const currentPos = cameraEl.getAttribute('position');
+                // Get the camera's rotation (in degrees) and convert the yaw (rotation.y) to radians.
+                const cameraRot = cameraEl.getAttribute('rotation');
+                const camYaw = cameraRot.y * Math.PI / 180;
+                
+                // Rotate the joystick delta relative to the camera's yaw.
+                const worldDx = dx * Math.cos(camYaw) - dz * Math.sin(camYaw);
+                const worldDz = dx * Math.sin(camYaw) + dz * Math.cos(camYaw);
+                
+                // Update the camera's position.
+                // Note: In A-Frame, moving forward typically means decreasing the z value.
+                cameraEl.setAttribute('position', {
+                    x: currentPos.x + worldDx,
+                    y: currentPos.y,
+                    z: currentPos.z - worldDz
                 });
+                }
+            });
+            
+            joystick.on('end', () => {
+                console.log('Joystick interaction ended');
+            });
             }
         });
-
       </script>
 
     <!-- Ensure Music Plays Method-->
