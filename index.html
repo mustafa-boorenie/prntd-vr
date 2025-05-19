@@ -109,17 +109,7 @@
             rotation="0 45 0">
         </a-entity>
 
-        <!-- 3D Model (PRNTD HOODIE) -->
-        <a-entity
-            id="prntdHoodie"
-            gltf-model="#prntd-hoodie-model"
-            position="6 -1 -5"
-            scale="2 2 2"
-            rotation="0 -45 0"
-            class="clickable"
-            animation__mouseenter="property: scale; to: 2.5 2.5 2.5; startEvents: mouseenter; dur: 200"
-            animation__mouseleave="property: scale; to: 2 2 2; startEvents: mouseleave; dur: 200">
-        </a-entity>
+        <!-- Hoodies will be generated dynamically -->
 
         <!-- Environment -->
         <a-entity id="environment" environment="preset: tron;"></a-entity>
@@ -254,15 +244,6 @@
         });
      </script>
 
-     <!--Click PRNTD Hoodie Method-->
-     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const prntdHoodie = document.querySelector('#prntdHoodie');
-          prntdHoodie.addEventListener('click', () => {
-            window.location.href = 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie';
-          });
-        });
-      </script>
 
     <!-- Click Egg Method -->
     <script>
@@ -338,6 +319,38 @@
             portalForest.addEventListener('click', () => switchEnvironment('forest'));
             portalEgypt.addEventListener('click', () => switchEnvironment('egypt'));
             portalTron.addEventListener('click', () => switchEnvironment('tron'));
+        });
+    </script>
+
+    <!-- Dynamically generate hoodie items -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hoodieData = [
+                { id: 'hoodie1', position: { x: -5, y: 1, z: -5 }, rotation: '0 -45 0', link: 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie-1' },
+                { id: 'hoodie2', position: { x: -3, y: 1, z: -5 }, rotation: '0 -45 0', link: 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie-2' },
+                { id: 'hoodie3', position: { x: -1, y: 1, z: -5 }, rotation: '0 -45 0', link: 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie-3' },
+                { id: 'hoodie4', position: { x: 1, y: 1, z: -5 }, rotation: '0 -45 0', link: 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie-4' },
+                { id: 'hoodie5', position: { x: 3, y: 1, z: -5 }, rotation: '0 -45 0', link: 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie-5' },
+                { id: 'hoodie6', position: { x: 5, y: 1, z: -5 }, rotation: '0 -45 0', link: 'https://prntdbybdq.com/collections/hoodies/products/prntd-hoodie-6' },
+            ];
+            const sceneEl = document.querySelector('a-scene');
+            hoodieData.forEach(data => {
+                const hoodieEl = document.createElement('a-entity');
+                hoodieEl.setAttribute('id', data.id);
+                hoodieEl.setAttribute('gltf-model', '#prntd-hoodie-model');
+                hoodieEl.setAttribute('position', `${data.position.x} ${data.position.y} ${data.position.z}`);
+                hoodieEl.setAttribute('scale', '2 2 2');
+                hoodieEl.setAttribute('rotation', data.rotation);
+                hoodieEl.setAttribute('class', 'clickable');
+                hoodieEl.setAttribute('animation__mouseenter', 'property: scale; to: 2.5 2.5 2.5; startEvents: mouseenter; dur: 200');
+                hoodieEl.setAttribute('animation__mouseleave', 'property: scale; to: 2 2 2; startEvents: mouseleave; dur: 200');
+                hoodieEl.addEventListener('click', () => {
+                    window.location.href = data.link;
+                });
+                sceneEl.appendChild(hoodieEl);
+            });
+            // Expose for future editing
+            window.hoodieData = hoodieData;
         });
     </script>
 </body>
